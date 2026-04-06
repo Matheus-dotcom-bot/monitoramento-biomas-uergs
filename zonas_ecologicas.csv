@@ -1,0 +1,7 @@
+﻿id_zona,nome_zona,descricao,acao_SIG,alvos_biologicos
+Z1,Praia oceânica,ambiente marinho costeiro,Adicionar polígono/linha no QGIS,Otaria flavescens
+Z2,Margem lagunar,lagoa com vegetação palustre,Adicionar polígono/linha no QGIS,Caiman latirostris
+Z3,Estuário / pesca,águas salobras e pesca,Adicionar polígono/linha no QGIS,Ariidae
+Z4,Córrego urbano,drenagem urbana vegetada,Adicionar polígono/linha no QGIS,Theristicus caudatus
+Z5,Área verde urbana,gramados e arborização,Adicionar polígono/linha no QGIS,Coragyps atratus; flora urbana
+Z6,Microhabitat de decomposição,tronco / madeira morta,Adicionar ponto/polígono no QGIS,funga decompositora

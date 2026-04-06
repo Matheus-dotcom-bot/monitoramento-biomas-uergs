@@ -1,0 +1,9 @@
+﻿id,grupo,subgrupo,nome_cientifico,nome_comum,municipio,local_sistema,habitat,data_obs,latitude,longitude,precisao_m,metodo,evidencia_foto,observacoes,confianca_id
+1,Fauna,Herpetofauna,Caiman latirostris,jacaré-de-papo-amarelo,Imbé,Margem lagunar,margem de lagoa com vegetação palustre,,,,,registro fotográfico,foto_jacare_01.jpg,indivíduo em margem lagunar,alta
+2,Fauna,Mamífero marinho,Otaria flavescens,leão-marinho-sul-americano,Imbé,Praia oceânica,praia arenosa,,,,,registro fotográfico,foto_leao_marinho_01.jpg,indivíduo em descanso na praia,média
+3,Fauna,Ictiofauna,Ariidae,bagre,Imbé/Tramandaí,Estuário / pesca,ambiente estuarino,,,,,registro fotográfico,foto_bagre_01.jpg,exemplar juvenil,média
+4,Fauna,Avifauna,Theristicus caudatus,curicaca,Imbé,Córrego urbano,gramado próximo a córrego,,,,,registro fotográfico,foto_curicaca_01.jpg,forrageando próximo à drenagem,média
+5,Fauna,Avifauna,Coragyps atratus,urubu-de-cabeça-preta,Imbé,Área verde urbana,gramado urbano,,,,,registro fotográfico,foto_urubu_01.jpg,grupo em área urbana,média
+6,Funga,Basidiomycota,cf. poliporo lignícola,fungo decompositor,Imbé,Microhabitat de decomposição,tronco em decomposição,,,,,registro fotográfico,foto_fungo_01.jpg,frutificação em madeira morta,média
+7,Flora,Árvore,Syagrus romanzoffiana,jerivá,Imbé,Área verde urbana,jardim/área urbana costeira,,,,,registro fotográfico,foto_jeriva_01.jpg,palmeira registrada em área urbana,baixa
+8,Flora,Árvore,Casuarina equisetifolia,casuarina,Imbé,Corredor verde costeiro,corredor arborizado urbano,,,,,registro fotográfico,foto_casuarina_01.jpg,árvores altas tolerantes ao vento,baixa
