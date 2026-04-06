@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento de Biomas - UERGS Litoral Norte</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { background-color: #2c3e50; color: white; padding: 15px; text-align: center; border-radius: 5px; }
+        input { width: 95%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Gestão de Monitoramento - Imbé/RS</h2>
+    
+    <input type="text" id="pesquisador" placeholder="Nome do Pesquisador (Ex: Matheus Pedroso)">
+    <input type="text" id="ponto_id" placeholder="ID do Ponto (Vincular ao GeoJSON)">
+    <input type="text" id="especie" placeholder="Espécie ou Bioma Observado">
+    <input type="number" id="quantidade" placeholder="Quantidade de Indivíduos/Amostras">
+    
+    <button onclick="adicionarRegistro()">Adicionar ao Banco de Dados</button>
+
+    <table id="tabelaRegistros">
+        <thead>
+            <tr>
+                <th>Pesquisador</th>
+                <th>Ponto ID</th>
+                <th>Espécie/Bioma</th>
+                <th>Qtd</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+    <p><strong>Total de Registros: <span id="contador">0</span></strong></p>
+</div>
+
+<script>
+    function adicionarRegistro() {
+        const p = document.getElementById('pesquisador').value;
+        const id = document.getElementById('ponto_id').value;
+        const esp = document.getElementById('especie').value;
+        const q = document.getElementById('quantidade').value;
+
+        if(!p || !id || !esp || !q) return alert("Preencha todos os campos!");
+
+        const tabela = document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0];
+        const novaLinha = tabela.insertRow();
+        
+        novaLinha.innerHTML = `<td>${p}</td><td>${id}</td><td>${esp}</td><td>${q}</td><td>Pendente</td><td><button style="background:red; width:auto; padding:5px;" onclick="this.parentElement.parentElement.remove()">Remover</button></td>`;
+        
+        document.getElementById('contador').innerText = tabela.rows.length;
+    }
+</script>
+
+</body>
+</html>
