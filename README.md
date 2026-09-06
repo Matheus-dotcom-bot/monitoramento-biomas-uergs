@@ -1,58 +1,88 @@
 # 🌿 Monitoramento de Biomas — UERGS Litoral Norte
 
-Sistema experimental para registro, organização e visualização de dados biológicos coletados em campo, com foco em Imbé/RS.
+> Protótipo acadêmico client-side para registro e visualização de observações de monitoramento ambiental, com foco em Imbé/RS.
+
+![Status](https://img.shields.io/badge/Status-Academic%20Prototype-blue)
+![Platform](https://img.shields.io/badge/Platform-Web-lightgrey)
+![Architecture](https://img.shields.io/badge/Architecture-Client--side-lightgrey)
 
 ## 🎯 Objetivo
 
-O projeto explora uma interface web simples para apoiar o registro de observações e a organização de pontos de coleta, conectando os registros a dados geográficos em GeoJSON.
+O projeto explora uma interface web simples para apoiar o registro de observações e a organização de pontos de coleta, conectando os registros a dados geográficos em **GeoJSON** e visualizando-os com **Leaflet**.
+
+A proposta é experimental e acadêmica: o foco está na organização dos dados e na integração entre formulário, tabela e informação geoespacial.
 
 ## 🚀 Funcionalidades
 
 - Cadastro local de pesquisador, ponto, espécie/bioma e quantidade.
+- Validação básica dos campos do formulário.
 - Tabela dinâmica de registros.
 - Contador de registros.
-- Visualização das camadas zonas_ecologicas.geojson e observacoes_pontos.geojson.
+- Remoção de registros da sessão atual.
+- Visualização das camadas `zonas_ecologicas.geojson` e `observacoes_pontos.geojson`.
 - Mapa client-side com Leaflet.
-- Mensagem explícita quando o GeoJSON está vazio ou não pode ser carregado.
+- Ajuste automático do mapa quando existem feições GeoJSON.
+- Mensagem explícita quando os GeoJSON estão vazios ou não podem ser carregados.
 
 ## 🔐 Segurança
 
-A criação das linhas da tabela não utiliza mais interpolação de entrada do usuário em innerHTML.
+A criação das linhas da tabela não utiliza interpolação de entrada do usuário em `innerHTML`. Os valores fornecidos pelo usuário são inseridos com `textContent` e APIs DOM, reduzindo o risco de XSS baseado em HTML injetado.
 
-Os valores fornecidos pelo usuário são inseridos usando textContent e APIs DOM, reduzindo o risco de XSS baseado em HTML injetado.
+O formulário também aplica limites básicos de tamanho e validação de quantidade no cliente.
 
-> Este projeto é uma aplicação client-side experimental. Não deve ser considerado um sistema de produção ou banco de dados seguro sem backend, autenticação, autorização, validação server-side e persistência adequada.
+> **Importante:** validação client-side não é uma barreira de segurança para sistemas reais. Este projeto não possui backend, autenticação, autorização, persistência ou validação server-side.
+
+O tratamento de erro do carregamento GeoJSON evita expor diretamente ao usuário detalhes internos da exceção, mantendo o diagnóstico técnico no console do navegador.
 
 ## 🗺️ Dados geográficos
 
-Os GeoJSON atuais fazem parte do repositório e são carregados com fetch().
+Os arquivos GeoJSON fazem parte do repositório e são carregados com `fetch()`.
 
-No estado atual, arquivos GeoJSON podem estar sem feições. Isso é tratado como ausência de dados, não como erro silencioso.
+No estado atual, os arquivos podem estar sem feições. Isso é tratado como ausência de dados, e não como erro silencioso.
 
-Para trabalhar com dados reais de campo, mantenha propriedades e coordenadas válidas no padrão GeoJSON.
+Para dados reais de campo, mantenha propriedades e coordenadas válidas no padrão GeoJSON e avalie previamente requisitos de privacidade, governança e sensibilidade das informações geográficas.
 
-## ▶️ Execução
+## ▶️ Execução local
 
-Como o navegador pode bloquear fetch() de arquivos locais por CORS, execute um servidor HTTP simples na pasta do projeto:
+Como o navegador pode bloquear `fetch()` de arquivos locais por CORS, execute um servidor HTTP simples na pasta do projeto:
 
-    python -m http.server 8000
+```bash
+python -m http.server 8000
+```
 
-Depois acesse http://localhost:8000.
+Depois acesse `http://localhost:8000`.
+
+## 🧱 Arquitetura
+
+A aplicação é composta por uma página HTML com CSS e JavaScript embarcados, além dos arquivos GeoJSON do projeto.
+
+**Dependência externa principal:** Leaflet 1.9.4 e os tiles do OpenStreetMap para a visualização cartográfica.
+
+Não existe backend ou banco de dados neste repositório.
 
 ## 🎓 Contexto acadêmico
 
 Projeto desenvolvido no contexto de atividades acadêmicas de Ciências Biológicas, com foco em organização de dados de monitoramento ambiental e integração com ferramentas de SIG.
 
-## 📌 Estado
+## 📌 Estado atual
 
-**Protótipo acadêmico funcional**, com integração client-side de GeoJSON e Leaflet.
+**Protótipo acadêmico funcional.**
 
-Ainda faltam, para uma versão de produção:
+O projeto já demonstra o fluxo básico de entrada local, renderização segura dos registros e visualização de dados GeoJSON. Ainda não deve ser tratado como sistema de coleta ou gestão de dados de produção.
+
+### Evoluções necessárias para produção
 
 - backend e banco de dados;
-- autenticação/autorização;
+- autenticação e autorização;
 - validação server-side;
-- persistência;
+- persistência e controle de concorrência;
 - testes automatizados;
-- tratamento de dados geoespaciais mais completo;
-- controles de privacidade e governança de dados.
+- tratamento geoespacial mais completo;
+- trilha de auditoria;
+- controles de privacidade e governança de dados;
+- política de retenção e recuperação de dados;
+- revisão das dependências externas e integridade dos recursos carregados.
+
+## 📄 Licença
+
+Nenhuma licença de software é declarada atualmente no repositório. Até que uma licença seja adicionada, o código deve ser tratado como **todos os direitos reservados** pelo titular do repositório, salvo indicação em contrário.
