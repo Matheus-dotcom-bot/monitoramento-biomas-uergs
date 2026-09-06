@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Protótipo acadêmico para registro e visualização de observações de monitoramento ambiental em Imbé/RS.">
+    <meta name="description" content="Protótipo acadêmico client-side para registro e visualização de observações ambientais em Imbé/RS.">
     <title>Monitoramento de Biomas - UERGS Litoral Norte</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <style>
@@ -23,6 +23,8 @@
         th { background:#f8f9fa; }
         #map { height:360px; margin-top:24px; border:1px solid var(--border); border-radius:6px; }
         .status { margin-top:10px; padding:10px; background:#f5f7f6; border-radius:4px; font-size:.9rem; }
+        .notice { margin-top:14px; padding:12px; border-left:4px solid var(--primary); background:#f5f7f6; font-size:.9rem; }
+        .table-wrap { overflow-x:auto; }
         @media (max-width:700px) {
             body { padding:10px; }
             .container { padding:14px; }
@@ -34,21 +36,25 @@
 <div class="container">
     <h1>Gestão de Monitoramento - Imbé/RS</h1>
 
+    <p class="notice" role="note"><strong>Modo de demonstração:</strong> os registros adicionados neste formulário ficam apenas na memória desta página. Eles são apagados ao recarregar ou fechar a aplicação e <strong>não constituem armazenamento científico permanente</strong>.</p>
+
     <form id="registroForm">
         <div class="grid">
             <div><label for="pesquisador">Pesquisador</label><input type="text" id="pesquisador" maxlength="120" autocomplete="name" placeholder="Nome do pesquisador" required></div>
             <div><label for="ponto_id">Ponto ID</label><input type="text" id="ponto_id" maxlength="80" placeholder="ID do ponto" required></div>
             <div><label for="especie">Espécie ou bioma</label><input type="text" id="especie" maxlength="160" placeholder="Espécie ou bioma observado" required></div>
-            <div><label for="quantidade">Quantidade</label><input type="number" id="quantidade" min="0" step="1" inputmode="numeric" placeholder="Número de indivíduos/amostras" required></div>
+            <div><label for="quantidade">Quantidade</label><input type="number" id="quantidade" min="0" max="1000000000" step="1" inputmode="numeric" placeholder="Número de indivíduos/amostras" required></div>
         </div>
         <button type="submit" style="margin-top:14px;">Adicionar registro</button>
     </form>
 
-    <table id="tabelaRegistros">
-        <thead><tr><th>Pesquisador</th><th>Ponto ID</th><th>Espécie/Bioma</th><th>Qtd</th><th>Status</th><th>Ações</th></tr></thead>
-        <tbody></tbody>
-    </table>
-    <p><strong>Total de Registros: <span id="contador">0</span></strong></p>
+    <div class="table-wrap">
+        <table id="tabelaRegistros">
+            <thead><tr><th>Pesquisador</th><th>Ponto ID</th><th>Espécie/Bioma</th><th>Qtd</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <p><strong>Total de Registros: <span id="contador" aria-live="polite">0</span></strong></p>
 
     <h2>Mapa de pontos de observação</h2>
     <div id="map" aria-label="Mapa de pontos de observação"></div>
@@ -74,16 +80,18 @@
     form.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const p = document.getElementById('pesquisador').value.trim();
-        const id = document.getElementById('ponto_id').value.trim();
-        const esp = document.getElementById('especie').value.trim();
-        const q = document.getElementById('quantidade').value;
-        const quantidade = Number(q);
-
-        if (!p || !id || !esp || q === '' || !Number.isInteger(quantidade) || quantidade < 0) {
+        if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
+
+        const p = document.getElementById('pesquisador').value.trim();
+        const id = document.getElementById('ponto_id').value.trim();
+        const esp = document.getElementById('especie').value.trim();
+        const qRaw = document.getElementById('quantidade').value;
+        const quantidade = Number(qRaw);
+
+        if (!p || !id || !esp || qRaw === '' || !Number.isSafeInteger(quantidade) || quantidade < 0 || quantidade > 1000000000) return;
 
         const row = tbody.insertRow();
         adicionarCelula(row, p);
@@ -151,7 +159,7 @@
                 ? 'Camadas carregadas: ' + total + ' feições GeoJSON.'
                 : 'GeoJSON carregado corretamente, mas ainda não contém feições. Adicione dados de campo para visualizar pontos/zonas.';
         } catch (error) {
-            console.error('Falha ao carregar GeoJSON:', error);
+            console.error('Falha ao carregar camadas GeoJSON:', error);
             status.textContent = 'Não foi possível carregar as camadas GeoJSON. Verifique os arquivos e a execução por servidor HTTP.';
         }
     }
