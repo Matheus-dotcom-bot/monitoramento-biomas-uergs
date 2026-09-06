@@ -1,24 +1,58 @@
-🌿 Sistema de Monitoramento de Biomas e Gestão de Coletas - Imbé/RS
+# 🌿 Monitoramento de Biomas — UERGS Litoral Norte
 
-Este repositório contém uma ferramenta integrada para o registro, organização e visualização de dados biológicos coletados em campo, com foco na unidade Litoral Norte da UERGS.
+Sistema experimental para registro, organização e visualização de dados biológicos coletados em campo, com foco em Imbé/RS.
 
-O projeto une uma interface amigável de Gestão de Pedidos/Registros com a precisão de dados geográficos (SIG) para o mapeamento de ecossistemas locais.
-🚀 Funcionalidades Principais
+## 🎯 Objetivo
 
-    Cadastro de Amostras: Interface para entrada de dados de pesquisadores e identificação de espécimes (ex: Protistas, flora de restinga).
+O projeto explora uma interface web simples para apoiar o registro de observações e a organização de pontos de coleta, conectando os registros a dados geográficos em GeoJSON.
 
-    Visualização Geográfica: Integração com arquivos .geojson e .csv para localização precisa de pontos de coleta em Imbé/RS.
+## 🚀 Funcionalidades
 
-    Categorização de Zonas: Mapeamento estruturado de zonas ecológicas e áreas de preservação.
+- Cadastro local de pesquisador, ponto, espécie/bioma e quantidade.
+- Tabela dinâmica de registros.
+- Contador de registros.
+- Visualização das camadas zonas_ecologicas.geojson e observacoes_pontos.geojson.
+- Mapa client-side com Leaflet.
+- Mensagem explícita quando o GeoJSON está vazio ou não pode ser carregado.
 
-📂 Estrutura do Projeto
+## 🔐 Segurança
 
-    /templates: Contém as camadas geográficas e registros base de observação.
+A criação das linhas da tabela não utiliza mais interpolação de entrada do usuário em innerHTML.
 
-    index.html: Interface de usuário para a gestão e visualização dos dados.
+Os valores fornecidos pelo usuário são inseridos usando textContent e APIs DOM, reduzindo o risco de XSS baseado em HTML injetado.
 
-    QGIS_quickstart.md: Guia rápido para integração dos dados com softwares de SIG.
+> Este projeto é uma aplicação client-side experimental. Não deve ser considerado um sistema de produção ou banco de dados seguro sem backend, autenticação, autorização, validação server-side e persistência adequada.
 
-🎓 Contexto Acadêmico
+## 🗺️ Dados geográficos
 
-Este software foi desenvolvido como parte das atividades de graduação em Ciências Biológicas, visando otimizar a triagem de amostras e a organização de dados para bolsas de Prodiscente e projetos de monitoramento ambiental.
+Os GeoJSON atuais fazem parte do repositório e são carregados com fetch().
+
+No estado atual, arquivos GeoJSON podem estar sem feições. Isso é tratado como ausência de dados, não como erro silencioso.
+
+Para trabalhar com dados reais de campo, mantenha propriedades e coordenadas válidas no padrão GeoJSON.
+
+## ▶️ Execução
+
+Como o navegador pode bloquear fetch() de arquivos locais por CORS, execute um servidor HTTP simples na pasta do projeto:
+
+    python -m http.server 8000
+
+Depois acesse http://localhost:8000.
+
+## 🎓 Contexto acadêmico
+
+Projeto desenvolvido no contexto de atividades acadêmicas de Ciências Biológicas, com foco em organização de dados de monitoramento ambiental e integração com ferramentas de SIG.
+
+## 📌 Estado
+
+**Protótipo acadêmico funcional**, com integração client-side de GeoJSON e Leaflet.
+
+Ainda faltam, para uma versão de produção:
+
+- backend e banco de dados;
+- autenticação/autorização;
+- validação server-side;
+- persistência;
+- testes automatizados;
+- tratamento de dados geoespaciais mais completo;
+- controles de privacidade e governança de dados.
