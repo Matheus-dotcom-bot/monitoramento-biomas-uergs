@@ -1,66 +1,153 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de monitoramento de biomas e gestão de coletas em Imbé/RS.">
     <title>Monitoramento de Biomas - UERGS Litoral Norte</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        crossorigin="">
     <style>
-        body { font-family: sans-serif; background-color: #f4f7f6; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h2 { background-color: #2c3e50; color: white; padding: 15px; text-align: center; border-radius: 5px; }
-        input { width: 95%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
-        button { width: 100%; padding: 12px; background-color: #2c3e50; color: white; border: none; cursor: pointer; font-size: 16px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: #f8f9fa; }
+        :root { --primary:#2c3e50; --bg:#f4f7f6; --border:#dfe5e3; }
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background:var(--bg); padding:20px; color:#1f2933; }
+        .container { max-width:1000px; margin:auto; background:white; padding:20px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
+        h1 { background:var(--primary); color:white; padding:15px; text-align:center; border-radius:5px; font-size:1.35rem; }
+        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
+        label { display:block; font-weight:600; font-size:.9rem; margin-top:4px; }
+        input { width:100%; padding:10px; margin-top:6px; border:1px solid #cfd8d5; border-radius:4px; }
+        button { width:100%; padding:12px; background:var(--primary); color:white; border:0; border-radius:4px; cursor:pointer; font-size:16px; }
+        button:hover { filter:brightness(1.1); }
+        .secondary { width:auto; padding:8px 12px; background:#8b1e1e; font-size:14px; }
+        table { width:100%; border-collapse:collapse; margin-top:20px; }
+        th,td { border:1px solid var(--border); padding:10px; text-align:left; }
+        th { background:#f8f9fa; }
+        #map { height:360px; margin-top:24px; border:1px solid var(--border); border-radius:6px; }
+        .status { margin-top:10px; padding:10px; background:#f5f7f6; border-radius:4px; font-size:.9rem; }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h2>Gestão de Monitoramento - Imbé/RS</h2>
-    
-    <input type="text" id="pesquisador" placeholder="Nome do Pesquisador (Ex: Matheus Pedroso)">
-    <input type="text" id="ponto_id" placeholder="ID do Ponto (Vincular ao GeoJSON)">
-    <input type="text" id="especie" placeholder="Espécie ou Bioma Observado">
-    <input type="number" id="quantidade" placeholder="Quantidade de Indivíduos/Amostras">
-    
-    <button onclick="adicionarRegistro()">Adicionar ao Banco de Dados</button>
+    <h1>Gestão de Monitoramento - Imbé/RS</h1>
+
+    <form id="registroForm">
+        <div class="grid">
+            <div><label for="pesquisador">Pesquisador</label><input type="text" id="pesquisador" placeholder="Nome do pesquisador" required></div>
+            <div><label for="ponto_id">Ponto ID</label><input type="text" id="ponto_id" placeholder="ID do ponto" required></div>
+            <div><label for="especie">Espécie ou bioma</label><input type="text" id="especie" placeholder="Espécie ou bioma observado" required></div>
+            <div><label for="quantidade">Quantidade</label><input type="number" id="quantidade" min="0" step="1" placeholder="Número de indivíduos/amostras" required></div>
+        </div>
+        <button type="submit" style="margin-top:14px;">Adicionar registro</button>
+    </form>
 
     <table id="tabelaRegistros">
-        <thead>
-            <tr>
-                <th>Pesquisador</th>
-                <th>Ponto ID</th>
-                <th>Espécie/Bioma</th>
-                <th>Qtd</th>
-                <th>Status</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            </tbody>
+        <thead><tr><th>Pesquisador</th><th>Ponto ID</th><th>Espécie/Bioma</th><th>Qtd</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody></tbody>
     </table>
     <p><strong>Total de Registros: <span id="contador">0</span></strong></p>
+
+    <h2>Mapa de pontos de observação</h2>
+    <div id="map" aria-label="Mapa de pontos de observação"></div>
+    <div id="geojsonStatus" class="status" role="status">Carregando camadas GeoJSON…</div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
-    function adicionarRegistro() {
-        const p = document.getElementById('pesquisador').value;
-        const id = document.getElementById('ponto_id').value;
-        const esp = document.getElementById('especie').value;
+    const form = document.getElementById('registroForm');
+    const tbody = document.querySelector('#tabelaRegistros tbody');
+    const contador = document.getElementById('contador');
+
+    function atualizarContador() {
+        contador.textContent = String(tbody.rows.length);
+    }
+
+    function adicionarCelula(row, value) {
+        const cell = row.insertCell();
+        cell.textContent = String(value);
+        return cell;
+    }
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const p = document.getElementById('pesquisador').value.trim();
+        const id = document.getElementById('ponto_id').value.trim();
+        const esp = document.getElementById('especie').value.trim();
         const q = document.getElementById('quantidade').value;
 
-        if(!p || !id || !esp || !q) return alert("Preencha todos os campos!");
+        if (!p || !id || !esp || q === '') return;
 
-        const tabela = document.getElementById('tabelaRegistros').getElementsByTagName('tbody')[0];
-        const novaLinha = tabela.insertRow();
-        
-        novaLinha.innerHTML = `<td>${p}</td><td>${id}</td><td>${esp}</td><td>${q}</td><td>Pendente</td><td><button style="background:red; width:auto; padding:5px;" onclick="this.parentElement.parentElement.remove()">Remover</button></td>`;
-        
-        document.getElementById('contador').innerText = tabela.rows.length;
+        const row = tbody.insertRow();
+        adicionarCelula(row, p);
+        adicionarCelula(row, id);
+        adicionarCelula(row, esp);
+        adicionarCelula(row, q);
+        adicionarCelula(row, 'Pendente');
+
+        const actions = row.insertCell();
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'secondary';
+        remove.textContent = 'Remover';
+        remove.addEventListener('click', () => {
+            row.remove();
+            atualizarContador();
+        });
+        actions.appendChild(remove);
+
+        atualizarContador();
+        form.reset();
+        document.getElementById('pesquisador').focus();
+    });
+
+    const map = L.map('map').setView([-29.975, -50.13], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    async function carregarGeoJSON(url, nome) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(nome + ': HTTP ' + response.status);
+        return response.json();
     }
-</script>
 
+    async function carregarCamadas() {
+        const status = document.getElementById('geojsonStatus');
+        try {
+            const [zonas, pontos] = await Promise.all([
+                carregarGeoJSON('zonas_ecologicas.geojson', 'zonas_ecologicas'),
+                carregarGeoJSON('observacoes_pontos.geojson', 'observacoes_pontos')
+            ]);
+
+            const zonasLayer = L.geoJSON(zonas).addTo(map);
+            const pontosLayer = L.geoJSON(pontos, {
+                onEachFeature: (feature, layer) => {
+                    const props = feature && feature.properties ? feature.properties : {};
+                    const nome = props.nome || props.name || props.id || 'Ponto de observação';
+                    layer.bindPopup(String(nome));
+                }
+            }).addTo(map);
+
+            const layers = [];
+            if (zonas.features && zonas.features.length) layers.push(zonasLayer);
+            if (pontos.features && pontos.features.length) layers.push(pontosLayer);
+
+            if (layers.length) {
+                const group = L.featureGroup(layers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+
+            const total = (zonas.features?.length || 0) + (pontos.features?.length || 0);
+            status.textContent = total
+                ? 'Camadas carregadas: ' + total + ' feições GeoJSON.'
+                : 'GeoJSON carregado corretamente, mas ainda não contém feições. Adicione dados de campo para visualizar pontos/zonas.';
+        } catch (error) {
+            status.textContent = 'Não foi possível carregar as camadas GeoJSON: ' + error.message;
+        }
+    }
+
+    carregarCamadas();
+</script>
 </body>
 </html>
