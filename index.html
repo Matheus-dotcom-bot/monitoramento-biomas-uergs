@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sistema de monitoramento de biomas e gestão de coletas em Imbé/RS.">
+    <meta name="description" content="Protótipo acadêmico para registro e visualização de observações de monitoramento ambiental em Imbé/RS.">
     <title>Monitoramento de Biomas - UERGS Litoral Norte</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        crossorigin="">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
     <style>
         :root { --primary:#2c3e50; --bg:#f4f7f6; --border:#dfe5e3; }
         * { box-sizing: border-box; }
@@ -24,6 +23,11 @@
         th { background:#f8f9fa; }
         #map { height:360px; margin-top:24px; border:1px solid var(--border); border-radius:6px; }
         .status { margin-top:10px; padding:10px; background:#f5f7f6; border-radius:4px; font-size:.9rem; }
+        @media (max-width:700px) {
+            body { padding:10px; }
+            .container { padding:14px; }
+            table { display:block; overflow-x:auto; white-space:nowrap; }
+        }
     </style>
 </head>
 <body>
@@ -32,10 +36,10 @@
 
     <form id="registroForm">
         <div class="grid">
-            <div><label for="pesquisador">Pesquisador</label><input type="text" id="pesquisador" placeholder="Nome do pesquisador" required></div>
-            <div><label for="ponto_id">Ponto ID</label><input type="text" id="ponto_id" placeholder="ID do ponto" required></div>
-            <div><label for="especie">Espécie ou bioma</label><input type="text" id="especie" placeholder="Espécie ou bioma observado" required></div>
-            <div><label for="quantidade">Quantidade</label><input type="number" id="quantidade" min="0" step="1" placeholder="Número de indivíduos/amostras" required></div>
+            <div><label for="pesquisador">Pesquisador</label><input type="text" id="pesquisador" maxlength="120" autocomplete="name" placeholder="Nome do pesquisador" required></div>
+            <div><label for="ponto_id">Ponto ID</label><input type="text" id="ponto_id" maxlength="80" placeholder="ID do ponto" required></div>
+            <div><label for="especie">Espécie ou bioma</label><input type="text" id="especie" maxlength="160" placeholder="Espécie ou bioma observado" required></div>
+            <div><label for="quantidade">Quantidade</label><input type="number" id="quantidade" min="0" step="1" inputmode="numeric" placeholder="Número de indivíduos/amostras" required></div>
         </div>
         <button type="submit" style="margin-top:14px;">Adicionar registro</button>
     </form>
@@ -48,7 +52,7 @@
 
     <h2>Mapa de pontos de observação</h2>
     <div id="map" aria-label="Mapa de pontos de observação"></div>
-    <div id="geojsonStatus" class="status" role="status">Carregando camadas GeoJSON…</div>
+    <div id="geojsonStatus" class="status" role="status" aria-live="polite">Carregando camadas GeoJSON…</div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
@@ -74,14 +78,18 @@
         const id = document.getElementById('ponto_id').value.trim();
         const esp = document.getElementById('especie').value.trim();
         const q = document.getElementById('quantidade').value;
+        const quantidade = Number(q);
 
-        if (!p || !id || !esp || q === '') return;
+        if (!p || !id || !esp || q === '' || !Number.isInteger(quantidade) || quantidade < 0) {
+            form.reportValidity();
+            return;
+        }
 
         const row = tbody.insertRow();
         adicionarCelula(row, p);
         adicionarCelula(row, id);
         adicionarCelula(row, esp);
-        adicionarCelula(row, q);
+        adicionarCelula(row, quantidade);
         adicionarCelula(row, 'Pendente');
 
         const actions = row.insertCell();
@@ -143,7 +151,8 @@
                 ? 'Camadas carregadas: ' + total + ' feições GeoJSON.'
                 : 'GeoJSON carregado corretamente, mas ainda não contém feições. Adicione dados de campo para visualizar pontos/zonas.';
         } catch (error) {
-            status.textContent = 'Não foi possível carregar as camadas GeoJSON: ' + error.message;
+            console.error('Falha ao carregar GeoJSON:', error);
+            status.textContent = 'Não foi possível carregar as camadas GeoJSON. Verifique os arquivos e a execução por servidor HTTP.';
         }
     }
 
