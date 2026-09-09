@@ -5,6 +5,7 @@
 ![Status](https://img.shields.io/badge/Status-Academic%20Prototype-blue)
 ![Platform](https://img.shields.io/badge/Platform-Web-lightgrey)
 ![Architecture](https://img.shields.io/badge/Architecture-Client--side-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 ## 🎯 Objetivo
 
@@ -85,4 +86,4 @@ O projeto já demonstra o fluxo básico de entrada local, renderização segura 
 
 ## 📄 Licença
 
-Nenhuma licença de software é declarada atualmente no repositório. Até que uma licença seja adicionada, o código deve ser tratado como **todos os direitos reservados** pelo titular do repositório, salvo indicação em contrário.
+Este projeto é distribuído sob a **MIT License**. Consulte o arquivo [`LICENSE`](LICENSE) para os termos completos.
